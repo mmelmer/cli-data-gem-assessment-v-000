@@ -1,5 +1,2 @@
-require "new_gem/version"
-
-module NewGem
-  # Your code goes here...
-end
+require_relative "./new_gem/version"
+require_relative "./new_gem/cli"

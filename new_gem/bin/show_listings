@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
 
-puts "testing..."
+
+NewGem::CLI.new.call
