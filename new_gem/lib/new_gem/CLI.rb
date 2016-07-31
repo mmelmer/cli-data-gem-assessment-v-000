@@ -18,11 +18,16 @@ class NewGem::CLI
 
   def date_listings
     puts "these are today's shows..."
+    home = Nokogiri::HTML(open("http://www.ohmyrockness.com/shows"))
+    binding.pry
   end
 
 
   def venue_listings
-    puts "choose one of these venues..."
+    puts "what venue would you like to view?"
+    input = gets.strip
+    site = Nokogiri::HTML(open("http://www.ohmyrockness.com/venues/#{input}"))
+    binding.pry
   end
 
 
