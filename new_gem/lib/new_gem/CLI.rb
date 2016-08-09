@@ -24,13 +24,14 @@ require 'nokogiri'
 
   def date_listings
     i = 2
+    num = 1
     #while home.css(".ds-paging").text.strip.include?("Next Page")
     puts "loading today's shows..."
     puts "\n"
     home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
     while home.css(".ds-paging").text.strip.include?("Next Page")
-      home.css(".ds-event-category-music").each do |x|
-        puts x.css(".ds-venue-name > a span").text + ":"
+      home.css(".ds-event-category-music").each_with_index do |x, index|
+        puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
         puts x.css(".ds-listing-event-title-text").text
         puts x.css(".dtstart").text.strip 
         puts "\n"
@@ -51,7 +52,6 @@ require 'nokogiri'
     #home.css(".ds-event-category-music a span").each {|x| puts x.text}
 
     #home.css(".ds-listing-details").css(".dtstart").each {|x| puts x.text.strip }
-    binding.pry
   end
 
 
@@ -61,15 +61,18 @@ require 'nokogiri'
 
   def venue_listings
     puts "Which venue would you like to check out?"
-    input = gets.strip
-    #headless = Headless.new
-    #headless.start
-    #info = Watir::Browser.new 
-    #info.goto "http://www.ohmyrockness.com/venues/#{input}"
-    #site = Nokogiri::HTML.parse(info.html)
-    #headless.destroy
+    input = gets.chomp
+    input_format = input.gsub(/\s/, '-')
+    cap = input.split(" ").each {|word| word.capitalize!}.join(" ")
+    home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}"))
+    puts "These are the upcoming shows at #{cap}:"
+    puts "\n"
+
+    # date of show: home.css(".ds-events-group").first.css(".ds-event-date").text.strip
+    # time of show: home.css(".ds-events-group").first.css(".ds-event-time").text.strip
+    # bands playing: home.css(".ds-events-group").first.css(".ds-listing-event-title-text").text
+    
     binding.pry
-    puts "Here are the upcoming shows at #{input}:"
     # <show tag>.each do |show| puts "#{date tag}: #{each band tag}, #{time formatted within minimal digits}"
   end  
 
