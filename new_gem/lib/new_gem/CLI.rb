@@ -67,7 +67,12 @@ require 'nokogiri'
     home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}"))
     puts "These are the upcoming shows at #{cap}:"
     puts "\n"
-
+    home.css('.ds-events-group').each_with_index do |x, idx|
+      puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
+      puts x.css(".ds-listing-event-title-text").text
+      puts x.css(".ds-event-time").text.strip
+      puts "\n"
+    end
     # date of show: home.css(".ds-events-group").first.css(".ds-event-date").text.strip
     # time of show: home.css(".ds-events-group").first.css(".ds-event-time").text.strip
     # bands playing: home.css(".ds-events-group").first.css(".ds-listing-event-title-text").text
