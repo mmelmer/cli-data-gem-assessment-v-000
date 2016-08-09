@@ -67,16 +67,29 @@ require 'nokogiri'
     home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}"))
     puts "These are the upcoming shows at #{cap}:"
     puts "\n"
+    i = 1
     home.css('.ds-events-group').each_with_index do |x, idx|
       puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
       puts x.css(".ds-listing-event-title-text").text
       puts x.css(".ds-event-time").text.strip
       puts "\n"
+      i +=1
     end
     # date of show: home.css(".ds-events-group").first.css(".ds-event-date").text.strip
     # time of show: home.css(".ds-events-group").first.css(".ds-event-time").text.strip
     # bands playing: home.css(".ds-events-group").first.css(".ds-listing-event-title-text").text
-    
+    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If not, type no."
+    input_2 = gets.chomp
+    input_int = input_2.to_i
+    if input_2.downcase == "no"
+      puts "Have a nice day - check back tomorrow!"
+    elsif input_2.is_a?(Integer) && ((0 < input_2) && (input_2 < i))
+      puts "Here's the page for that show."
+    elsif input_int > 0
+      puts "Please enter a number between 1 and #{i-1}"
+    else
+      puts "Please enter the number of the show you'd like to learn more about."
+    end
     binding.pry
     # <show tag>.each do |show| puts "#{date tag}: #{each band tag}, #{time formatted within minimal digits}"
   end  
