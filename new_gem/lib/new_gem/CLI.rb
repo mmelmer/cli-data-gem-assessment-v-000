@@ -103,8 +103,11 @@ require 'launchy'
       # recursive?
     elsif ((0 < input_int) && (input_int < i))
       puts "Opening the page for that show:"
-      Launchy.open("www.ohmyrockness.com")
-      # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like that
+      base = "http://nyc-shows.brooklynvegan.com/"
+      extension = home.css("div.ds-event-category-music a")[input_int-1]["href"]
+      url = base + extension.to_s
+      Launchy.open(url)
+      # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
     elsif input_int > 0
       puts "Please enter a number between 1 and #{i-1}"
     else
