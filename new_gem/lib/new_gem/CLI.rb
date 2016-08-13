@@ -104,7 +104,8 @@ require 'launchy'
     elsif ((0 < input_int) && (input_int < i))
       puts "Opening the page for that show:"
       base = "http://nyc-shows.brooklynvegan.com/"
-      extension = home.css("div.ds-event-category-music a")[input_int-1]["href"]
+      extension = home.css("div.ds-events-group")[input_int-1].css(".ds-event-category-music").first.css("a").first["href"]
+    
       url = base + extension.to_s
       Launchy.open(url)
       # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
@@ -113,9 +114,12 @@ require 'launchy'
     else
       puts "Please enter the number of the show you'd like to learn more about."
     end
-    binding.pry
     # <show tag>.each do |show| puts "#{date tag}: #{each band tag}, #{time formatted within minimal digits}"
   end  
+
+
+
+  #div.ds-btn-container-buy-tix  
 
 end
  # def venue_show_selection
