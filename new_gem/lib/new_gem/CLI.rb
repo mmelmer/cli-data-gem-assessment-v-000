@@ -82,7 +82,7 @@ require 'launchy'
     puts "These are the upcoming shows at #{cap}:"
     puts "\n"
     i = 1
-    home.css('.ds-events-group').each_with_index do |x, idx|
+    home.css('.ds-event-category-music').each_with_index do |x, idx|
       puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
       puts x.css(".ds-listing-event-title-text").text
       puts x.css(".ds-event-time").text.strip
