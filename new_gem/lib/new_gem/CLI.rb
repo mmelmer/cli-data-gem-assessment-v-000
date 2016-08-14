@@ -14,7 +14,7 @@ require 'launchy'
       puts "I didn't understand your response."
       call
     end
-    if input.include?("today") #<---check that include? method works on strings
+    if input.include?("today")
       date_listings
     elsif input.include?("venue")
       venue_listings
@@ -104,8 +104,7 @@ require 'launchy'
     elsif ((0 < input_int) && (input_int < i))
       puts "Opening the page for that show:"
       base = "http://nyc-shows.brooklynvegan.com/"
-      extension = home.css("div.ds-events-group")[input_int-1].css(".ds-event-category-music").first.css("a").first["href"]
-    
+      extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
       url = base + extension.to_s
       Launchy.open(url)
       # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
