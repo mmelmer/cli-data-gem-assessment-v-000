@@ -92,6 +92,7 @@ require 'launchy'
     # date of show: home.css(".ds-events-group").first.css(".ds-event-date").text.strip
     # time of show: home.css(".ds-events-group").first.css(".ds-event-time").text.strip
     # bands playing: home.css(".ds-events-group").first.css(".ds-listing-event-title-text").text
+    binding.pry
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
     input_2 = gets.chomp
     input_int = input_2.to_i
@@ -102,12 +103,24 @@ require 'launchy'
       puts "Here are some more listings..."
       # recursive?
     elsif ((0 < input_int) && (input_int < i))
-      puts "Opening the page for that show:"
-      base = "http://nyc-shows.brooklynvegan.com/"
-      extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
-      url = base + extension.to_s
-      Launchy.open(url)
-      # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
+      if home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
+        puts "Would you like to buy tickets for the show or just learn more info?"
+        input_3 = gets.chomp
+        if (input_3.include?("tix") || input_3.include?("tick"))
+          puts "here's the tickets page"
+        elsif input_3.include?("info")
+          puts "here's more info"
+        else
+          puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
+        end
+      else
+        puts "Opening the page for that show:"
+        base = "http://nyc-shows.brooklynvegan.com/"
+        extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
+        url = base + extension.to_s
+        Launchy.open(url)
+        # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
+      end
     elsif input_int > 0
       puts "Please enter a number between 1 and #{i-1}"
     else
