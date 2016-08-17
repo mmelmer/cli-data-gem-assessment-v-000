@@ -61,7 +61,7 @@ class NewGem::CLI
   end
 
   def venue_listings
-    puts "Which venue would you like to check out?"
+    puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
     input = gets.chomp
     input_format = input.gsub(/\s/, '-')
     cap = input.split(" ").each {|word| word.capitalize!}.join(" ")
@@ -77,7 +77,6 @@ class NewGem::CLI
       puts "\n"
       i +=1
     end
-    binding.pry
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
     input_2 = gets.chomp
     input_int = input_2.to_i
@@ -92,13 +91,15 @@ class NewGem::CLI
         puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
         if (input_3.include?("tix") || input_3.include?("tick"))
-          puts "You can buy tickets here:"
+          puts "You can buy tickets here..."
+          sleep(0.5)
           Launchy.open(home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
         elsif input_3.include?("info")
-          puts "Opening the page for that show:"
+          puts "Opening the page for that show..."
           base = "http://nyc-shows.brooklynvegan.com/"
           extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
           url = base + extension.to_s
+          sleep(0.5)
           Launchy.open(url)
         else
           puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
