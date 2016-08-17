@@ -104,12 +104,17 @@ require 'launchy'
       # recursive?
     elsif ((0 < input_int) && (input_int < i))
       if home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
-        puts "Would you like to buy tickets for the show or just learn more info?"
+        puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
         if (input_3.include?("tix") || input_3.include?("tick"))
-          puts "here's the tickets page"
+          puts "You can buy tickets here:"
+          Launchy.open(home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
         elsif input_3.include?("info")
-          puts "here's more info"
+          puts "Opening the page for that show:"
+          base = "http://nyc-shows.brooklynvegan.com/"
+          extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
+          url = base + extension.to_s
+          Launchy.open(url)
         else
           puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
         end
@@ -119,14 +124,12 @@ require 'launchy'
         extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
         url = base + extension.to_s
         Launchy.open(url)
-        # actual url: home.css('ds-events-group')[input_int].css('a href')  <-- or something like
       end
     elsif input_int > 0
       puts "Please enter a number between 1 and #{i-1}"
     else
       puts "Please enter the number of the show you'd like to learn more about."
     end
-    # <show tag>.each do |show| puts "#{date tag}: #{each band tag}, #{time formatted within minimal digits}"
   end  
 
 
