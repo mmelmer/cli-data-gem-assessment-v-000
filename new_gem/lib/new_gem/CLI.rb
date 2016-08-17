@@ -1,10 +1,5 @@
 class NewGem::CLI
 
-
-require 'open-uri'
-require 'nokogiri'
-require 'launchy'
-
   attr_accessor :i
 
   def call
@@ -20,7 +15,6 @@ require 'launchy'
       venue_listings
     end
   end
-
 
   def date_listings
     @i = 2
