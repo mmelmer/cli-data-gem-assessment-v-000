@@ -65,12 +65,6 @@ require 'launchy'
       end
     end
   end
-    
-      
-    #home.css(".ds-event-category-music a span").each {|x| puts x.text}
-
-    #home.css(".ds-listing-details").css(".dtstart").each {|x| puts x.text.strip }
-
 
   def venue_listings
     puts "Which venue would you like to check out?"
@@ -89,9 +83,6 @@ require 'launchy'
       puts "\n"
       i +=1
     end
-    # date of show: home.css(".ds-events-group").first.css(".ds-event-date").text.strip
-    # time of show: home.css(".ds-events-group").first.css(".ds-event-time").text.strip
-    # bands playing: home.css(".ds-events-group").first.css(".ds-listing-event-title-text").text
     binding.pry
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
     input_2 = gets.chomp
@@ -132,11 +123,8 @@ require 'launchy'
     end
   end  
 
-
-
-  #div.ds-btn-container-buy-tix  
-
 end
+
  # def venue_show_selection
  #   input = ""
  #   yes = ["yes", "Yes", "YES", "Y", "y"]
@@ -154,34 +142,3 @@ end
  #     puts "goodbye."
  #   end
  # end
-
-
-
-
-# pry(#<NewGem::CLI>)> site.css("#upcomingShows").first.children.first.children[5].children[5].children.text.strip.split(", ")
-#
-
-# home.css(".ds-listing-details").first.css(".ds-venue-name").first
-
-
-
-
-
-
-# => venue name:   
-#   home.css(".ds-listing-details").first.css(".ds-venue-name > a span").text
-#
-# => band name:
-#   home.css(".ds-event-category-music a span")[1].text
-
-#  => show time:
-#   home.css(".ds-listing-details").first.css(".dtstart").text.strip 
-
-
-# http://nyc-shows.brooklynvegan.com/events/2016/08/05
-# http://nyc-shows.brooklynvegan.com/venues/barbes
-
-
-
-#home.css(".ds-event-category-music").first
-# 
