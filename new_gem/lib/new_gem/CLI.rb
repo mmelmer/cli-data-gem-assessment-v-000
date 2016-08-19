@@ -19,7 +19,6 @@ class NewGem::CLI
   def date_listings
     @i = 2
     num = 1
-    #while home.css(".ds-paging").text.strip.include?("Next Page")
     puts "\n"
     puts "loading today's shows..."
     puts "\n"
@@ -33,17 +32,25 @@ class NewGem::CLI
         puts "\n"
         num +=1
       end 
-      # home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?page=#{i}")
-      puts "If you'd like to find out about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
-      input_2 = gets.strip
-      if input_2.is_a?(Integer) && ((0 < input_2) && (input_2 < num))
-        return "I'll open that site for you..."
+      # 
+      puts "If you'd like to find out more about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
+      input = gets.strip
+      input_int = input.to_i
+      
+      if input.downcase == "done"
+        puts "\n"
+        puts "Have a nice day - check back tomorrow!"
+        exit
+      elsif input.downcase == "more"
+        #page +=1
+        puts "Here are some more listings..."
+        puts "\n"
+        # home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?page=#{page}")
+      elsif (0 < input_int) && (input_int < num)
+        puts "I'll open that site for you...(and this would open choice ##{input_int})"
+        sleep (0.5)
         Launchy.open("tinymixtapes.com")
-      elsif input_2 == "more"
-        return "Here's the next page of shows..."
-        # i += 1
-      elsif input_2 == "done"
-        return "Goodbye. Check back tomorrow!"
+        #Launchy.open(...)
       else
         return "I didn't understand your input. Please try again."
       end
@@ -61,6 +68,8 @@ class NewGem::CLI
   end
 
   def venue_listings
+    i = 1
+    page = 1
     puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
     input = gets.chomp
     input_format = input.gsub(/\s/, '-')
@@ -69,7 +78,6 @@ class NewGem::CLI
     puts "\n"
     puts "These are the upcoming shows at #{cap}:"
     puts "\n"
-    i = 1
     home.css('.ds-event-category-music').each_with_index do |x, idx|
       puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
       puts x.css(".ds-listing-event-title-text").text
@@ -83,9 +91,20 @@ class NewGem::CLI
     if input_2.downcase == "done"
       puts "\n"
       puts "Have a nice day - check back tomorrow!"
+      exit
     elsif input_2.downcase == "more"
+      page +=1
       puts "Here are some more listings..."
-      # recursive?
+      puts "\n"
+      i = 1
+      home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}?page=#{page}"))
+      home.css('.ds-event-category-music').each_with_index do |x, idx|
+        puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
+        puts x.css(".ds-listing-event-title-text").text
+        puts x.css(".ds-event-time").text.strip
+        puts "\n"
+        i +=1
+      end
     elsif ((0 < input_int) && (input_int < i))
       if home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
         puts "Would you like to buy tickets for that show or just get more info?"
