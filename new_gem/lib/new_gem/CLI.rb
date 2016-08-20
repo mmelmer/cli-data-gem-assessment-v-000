@@ -1,6 +1,6 @@
 class NewGem::CLI
 
-  attr_accessor :i
+  attr_accessor :i, :home, :page, :input_format
 
   def call
     puts "Hello! Would you like to check out today's shows or search by venue?"
@@ -16,36 +16,59 @@ class NewGem::CLI
     end
   end
 
+# def today_menu
+    #input = gets.strip
+      #input_int = input.to_i
+      #if input.downcase == "done"
+      #  puts "\n"
+      #  puts "Have a nice day - check back tomorrow!"
+      #  exit
+      #elsif input.downcase == "more"
+      #  @page +=1
+      #  puts "Here are some more listings..."
+      #  puts "\n"
+        # @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?@page=#{@page}")
+      #elsif (0 < input_int) && (input_int < num)
+      #  puts "I'll open that site for you...(and this would open choice ##{input_int})"
+      #  sleep (0.5)
+      #  Launchy.open("tinymixtapes.com")
+        #Launchy.open(...)
+      #else
+      #  puts "I didn't understand your input. Please try again."
+      #      choose_by_num
+      #end      
+
+
   def date_listings
-    @i = 2
+    @page = 1
     num = 1
+    @@home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
+
     puts "\n"
     puts "loading today's shows..."
     puts "\n"
-    home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
     
-    if home.css(".ds-paging").text.strip.include?("Next Page")
-      home.css(".ds-event-category-music").each_with_index do |x, index|
+    if @home.css(".ds-paging").text.strip.include?("Next page")
+      @home.css(".ds-event-category-music").each_with_index do |x, index|
         puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
         puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".dtstart").text.strip 
+        puts x.css(".dtstart").text.strip.split(" ").first
         puts "\n"
         num +=1
-      end 
-      # 
+      end
       puts "If you'd like to find out more about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
+      # today_menu
       input = gets.strip
       input_int = input.to_i
-      
       if input.downcase == "done"
         puts "\n"
         puts "Have a nice day - check back tomorrow!"
         exit
       elsif input.downcase == "more"
-        #page +=1
+        @page +=1
         puts "Here are some more listings..."
         puts "\n"
-        # home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?page=#{page}")
+        # @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?@page=#{@page}")
       elsif (0 < input_int) && (input_int < num)
         puts "I'll open that site for you...(and this would open choice ##{input_int})"
         sleep (0.5)
@@ -54,87 +77,100 @@ class NewGem::CLI
       else
         return "I didn't understand your input. Please try again."
       end
+      # <-- end today_menu
     else
-      home.css(".ds-event-category-music").each_with_index do |x, index|
+      @home.css(".ds-event-category-music").each_with_index do |x, index|
         puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
         puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".dtstart").text.strip 
+        puts x.css(".dtstart").text.strip
         puts "\n"
-        puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you're done, type done."
+        puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you'd like to exit, type done."
+        # today_menu
         input_2 = gets.strip
         return input_2
       end
+    # <-- end today_menu
     end
   end
 
-  def venue_listings
-    i = 1
-    page = 1
-    puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
-    input = gets.chomp
-    input_format = input.gsub(/\s/, '-')
-    cap = input.split(" ").each {|word| word.capitalize!}.join(" ")
-    home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}"))
-    puts "\n"
-    puts "These are the upcoming shows at #{cap}:"
-    puts "\n"
-    home.css('.ds-event-category-music').each_with_index do |x, idx|
-      puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
-      puts x.css(".ds-listing-event-title-text").text
-      puts x.css(".ds-event-time").text.strip
-      puts "\n"
-      i +=1
-    end
-    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
-    input_2 = gets.chomp
+   def venue_menu
+    input_2 = gets.chomp.downcase
     input_int = input_2.to_i
+    while (!input_2.include?("done") && !input_2.include?("more") && (input_int == 0))
+      puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
+        venue_menu
+    end
     if input_2.downcase == "done"
       puts "\n"
       puts "Have a nice day - check back tomorrow!"
       exit
     elsif input_2.downcase == "more"
-      page +=1
       puts "Here are some more listings..."
       puts "\n"
       i = 1
-      home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{input_format}?page=#{page}"))
-      home.css('.ds-event-category-music').each_with_index do |x, idx|
+      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}?page=#{@page}"))
+      binding.pry
+      @home.css('.ds-event-category-music').each_with_index do |x, idx|
         puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
-        puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".ds-event-time").text.strip
+        puts x.css(".ds-listing-event-title-text").text.strip
+        puts x.css(".ds-event-time").text.strip.split(" ").first
         puts "\n"
         i +=1
       end
-    elsif ((0 < input_int) && (input_int < i))
-      if home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
+      @page +=1
+    elsif ((0 < input_int) && (input_int < @i))
+      if @home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
         puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
         if (input_3.include?("tix") || input_3.include?("tick"))
           puts "You can buy tickets here..."
           sleep(0.5)
-          Launchy.open(home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
+          Launchy.open(@home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
+          exit
         elsif input_3.include?("info")
           puts "Opening the page for that show..."
           base = "http://nyc-shows.brooklynvegan.com/"
-          extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
+          extension = @home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
           url = base + extension.to_s
           sleep(0.5)
           Launchy.open(url)
+          exit
         else
-          puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
+          puts "I didn't understand your input. Please enter more, exit, or the number of your selection."
+          venue_menu
         end
       else
         puts "Opening the page for that show:"
         base = "http://nyc-shows.brooklynvegan.com/"
-        extension = home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
+        extension = @home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
         url = base + extension.to_s
         Launchy.open(url)
+        exit
       end
     elsif input_int > 0
       puts "Please enter a number between 1 and #{i-1}"
-    else
-      puts "Please enter the number of the show you'd like to learn more about."
+      venue_menu
     end
+  end
+
+  def venue_listings
+    @i = 1
+    @page = 2
+    puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
+    input = gets.chomp
+    @input_format = input.gsub(/\s/, '-')
+    @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}"))
+    puts "\n"
+    puts "\n"
+    @home.css('.ds-event-category-music').each_with_index do |x, idx|
+      puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
+      puts x.css(".ds-listing-event-title-text").text
+      puts x.css(".ds-event-time").text.strip.split(" ").first
+      puts "\n"
+      @i +=1
+    end
+    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
+    venue_menu
   end  
 
 end
