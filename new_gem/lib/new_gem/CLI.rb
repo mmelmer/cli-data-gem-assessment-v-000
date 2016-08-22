@@ -105,19 +105,25 @@ class NewGem::CLI
       puts "Have a nice day - check back tomorrow!"
       exit
     elsif input_2.downcase == "more"
-      puts "Here are some more listings..."
+      @i = 1
+      puts "Checking for more listings..."
       puts "\n"
-      i = 1
       @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}?page=#{@page}"))
-      binding.pry
       @home.css('.ds-event-category-music').each_with_index do |x, idx|
         puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
         puts x.css(".ds-listing-event-title-text").text.strip
         puts x.css(".ds-event-time").text.strip.split(" ").first
         puts "\n"
-        i +=1
+        @i +=1
       end
       @page +=1
+      if @home.css(".ds-paging").text.strip.include?("Next page")
+        puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
+        venue_menu
+      else
+        puts "You have reached the end of the listings for this venue. If you'd like to learn more about one of the shows, please enter its number. If you're done, type done."
+        venue_menu
+      end
     elsif ((0 < input_int) && (input_int < @i))
       if @home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
         puts "Would you like to buy tickets for that show or just get more info?"
@@ -136,7 +142,7 @@ class NewGem::CLI
           Launchy.open(url)
           exit
         else
-          puts "I didn't understand your input. Please enter more, exit, or the number of your selection."
+          puts "I didn't understand your input. Would you like to buy tickets for that show, or simply learn more information?"
           venue_menu
         end
       else
@@ -144,11 +150,12 @@ class NewGem::CLI
         base = "http://nyc-shows.brooklynvegan.com/"
         extension = @home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
         url = base + extension.to_s
+        sleep(0.5)
         Launchy.open(url)
         exit
       end
     elsif input_int > 0
-      puts "Please enter a number between 1 and #{i-1}"
+      puts "Please enter a number between 1 and #{@i-1}"
       venue_menu
     end
   end
@@ -161,19 +168,21 @@ class NewGem::CLI
     @input_format = input.gsub(/\s/, '-')
     @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}"))
     puts "\n"
-    puts "\n"
+    puts "\n"  
     @home.css('.ds-event-category-music').each_with_index do |x, idx|
       puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
-      puts x.css(".ds-listing-event-title-text").text
-      puts x.css(".ds-event-time").text.strip.split(" ").first
-      puts "\n"
-      @i +=1
-    end
+        puts x.css(".ds-listing-event-title-text").text
+        puts x.css(".ds-event-time").text.strip.split(" ").first
+        puts "\n"
+        @i +=1
+        end
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
     venue_menu
-  end  
-
-end
+    rescue OpenURI::HTTPError
+      puts "Sorry, I can't find that venue. Please try again."      
+      venue_listings
+    end
+  end
 
  # def venue_show_selection
  #   input = ""
