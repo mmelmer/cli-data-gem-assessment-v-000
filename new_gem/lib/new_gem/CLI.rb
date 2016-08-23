@@ -97,7 +97,7 @@ class NewGem::CLI
     input_2 = gets.chomp.downcase
     input_int = input_2.to_i
     while (!input_2.include?("done") && !input_2.include?("more") && (input_int == 0))
-      puts "I didn't understand your input. Would you like to buy tickets or just get more info?"
+      puts "I didn't understand your input. Please enter the number of the show you're interested in, enter 'more' for another page of listings, or type 'done' to exit."
         venue_menu
     end
     if input_2.downcase == "done"
@@ -106,6 +106,7 @@ class NewGem::CLI
       exit
     elsif input_2.downcase == "more"
       @i = 1
+      puts "\n"
       puts "Checking for more listings..."
       puts "\n"
       @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}?page=#{@page}"))
@@ -128,6 +129,10 @@ class NewGem::CLI
       if @home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
         puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
+        while (!input_3.include?("tix") && !input_3.include?("tick") && !input_3.include?("info"))
+           puts "I didn't understand your input. Would you like to buy tickets for that show, or simply learn more information?"
+           input_3 = gets.chomp
+        end 
         if (input_3.include?("tix") || input_3.include?("tick"))
           puts "You can buy tickets here..."
           sleep(0.5)
@@ -141,9 +146,6 @@ class NewGem::CLI
           sleep(0.5)
           Launchy.open(url)
           exit
-        else
-          puts "I didn't understand your input. Would you like to buy tickets for that show, or simply learn more information?"
-          venue_menu
         end
       else
         puts "Opening the page for that show:"
@@ -168,7 +170,7 @@ class NewGem::CLI
     @input_format = input.gsub(/\s/, '-')
     @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}"))
     puts "\n"
-    puts "\n"  
+    puts "\n"
     @home.css('.ds-event-category-music').each_with_index do |x, idx|
       puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
         puts x.css(".ds-listing-event-title-text").text
@@ -178,10 +180,10 @@ class NewGem::CLI
         end
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
     venue_menu
-    rescue OpenURI::HTTPError
-      puts "Sorry, I can't find that venue. Please try again."      
-      venue_listings
-    end
+  rescue OpenURI::HTTPError
+    puts "Sorry, I can't find that venue. Please try again."      
+    venue_listings
+    end  
   end
 
  # def venue_show_selection
