@@ -129,11 +129,11 @@ class NewGem::CLI
       if @home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
         puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
-        while (!input_3.include?("tix") && !input_3.include?("tick") && !input_3.include?("info"))
+        while (!input_3.include?("tix") && !input_3.include?("tick") && !input_3.include?("info") && !input_3.include?("buy"))
            puts "I didn't understand your input. Would you like to buy tickets for that show, or simply learn more information?"
            input_3 = gets.chomp
         end 
-        if (input_3.include?("tix") || input_3.include?("tick"))
+        if (input_3.include?("tix") || input_3.include?("tick") || input_3.include?("buy")) 
           puts "You can buy tickets here..."
           sleep(0.5)
           Launchy.open(@home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
@@ -165,6 +165,7 @@ class NewGem::CLI
   def venue_listings
     @i = 1
     @page = 2
+    puts "\n"
     puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
     input = gets.chomp
     @input_format = input.gsub(/\s/, '-')
@@ -178,28 +179,12 @@ class NewGem::CLI
         puts "\n"
         @i +=1
         end
-    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
+    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type 'more'. If you're done, type 'done'."
     venue_menu
   rescue OpenURI::HTTPError
-    puts "Sorry, I can't find that venue. Please try again."      
+    puts "\n"
+    puts "Sorry, I can't find that venue. Please try again."
+    puts "\n"      
     venue_listings
     end  
   end
-
- # def venue_show_selection
- #   input = ""
- #   yes = ["yes", "Yes", "YES", "Y", "y"]
- #   no = ["no", "No", "NO", "N", "n"]
- #   puts "Would you like to learn more about any of these shows?"
- #   input = gets.strip
- #   while !yes.include?(input) && no.include?(input)
- #     puts "I didn't understand your input. Would you like to hear about any of these shows?"
- #   end
- #   if yes.include?(input)
- #     puts "Enter the date of the show you'd like to see, formatted MM/DD."
- #     date = gets.strip
- #     <link to show page based on date entered>
- #   elsif no.include?(input)
- #     puts "goodbye."
- #   end
- # end
