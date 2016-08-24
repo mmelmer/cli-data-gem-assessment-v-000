@@ -6,7 +6,10 @@ class NewGem::CLI
     puts "Hello! Would you like to check out today's shows or search by venue?"
     input = gets.strip
     while !input.include?("today") && !input.include?("venue")
+      puts "\n"
       puts "I didn't understand your response."
+      puts "\n"
+      sleep(0.5)
       call
     end
     if input.include?("today")
@@ -42,7 +45,7 @@ class NewGem::CLI
   def date_listings
     @page = 1
     num = 1
-    @@home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
+    @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
 
     puts "\n"
     puts "loading today's shows..."
@@ -127,6 +130,7 @@ class NewGem::CLI
       end
     elsif ((0 < input_int) && (input_int < @i))
       if @home.css(".ds-event-category-music")[input_int-1].to_s.include?("ds-buy-tix")
+        puts "\n"
         puts "Would you like to buy tickets for that show or just get more info?"
         input_3 = gets.chomp
         while (!input_3.include?("tix") && !input_3.include?("tick") && !input_3.include?("info") && !input_3.include?("buy"))
@@ -134,6 +138,7 @@ class NewGem::CLI
            input_3 = gets.chomp
         end 
         if (input_3.include?("tix") || input_3.include?("tick") || input_3.include?("buy")) 
+          puts "\n"
           puts "You can buy tickets here..."
           sleep(0.5)
           Launchy.open(@home.css(".ds-event-category-music")[input_int-1].css(".ds-buy-tix").css("a").first["href"])
@@ -171,20 +176,23 @@ class NewGem::CLI
     @input_format = input.gsub(/\s/, '-')
     @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}"))
     puts "\n"
-    puts "\n"
-    @home.css('.ds-event-category-music').each_with_index do |x, idx|
-      puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
-        puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".ds-event-time").text.strip.split(" ").first
-        puts "\n"
-        @i +=1
-        end
+    if !@home.to_s.include?("ds-event-category-music")
+      puts "There aren't any shows scheduled at #{input.split.each {|w| w.capitalize!}.join(" ")}."
+      venue_listings
+    else
+      @home.css('.ds-event-category-music').each_with_index do |x, idx|
+        puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
+          puts x.css(".ds-listing-event-title-text").text
+          puts x.css(".ds-event-time").text.strip.split(" ").first
+          puts "\n"
+          @i +=1
+          end
+    end
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type 'more'. If you're done, type 'done'."
     venue_menu
   rescue OpenURI::HTTPError
     puts "\n"
-    puts "Sorry, I can't find that venue. Please try again."
-    puts "\n"      
+    puts "Sorry, I can't find that venue. Please try again."      
     venue_listings
     end  
   end
