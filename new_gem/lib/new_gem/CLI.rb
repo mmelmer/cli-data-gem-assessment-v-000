@@ -1,6 +1,6 @@
 class NewGem::CLI
 
-  attr_accessor :i, :home, :page, :input_format
+  #attr_accessor :i, :home, :page, :input_format
 
   def call
     puts "Hello! Would you like to check out today's shows or search by venue?"
@@ -99,6 +99,7 @@ class NewGem::CLI
    def venue_menu
     input_2 = gets.chomp.downcase
     input_int = input_2.to_i
+    @more_count = 1
     while (!input_2.include?("done") && !input_2.include?("more") && (input_int == 0))
       puts "I didn't understand your input. Please enter the number of the show you're interested in, enter 'more' for another page of listings, or type 'done' to exit."
         venue_menu
@@ -108,7 +109,9 @@ class NewGem::CLI
       puts "Have a nice day - check back tomorrow!"
       exit
     elsif input_2.downcase == "more"
-      @i = 1
+      if @more_count < 2 
+        @i = 1
+      end
       puts "\n"
       puts "Checking for more listings..."
       puts "\n"
@@ -119,6 +122,7 @@ class NewGem::CLI
         puts x.css(".ds-event-time").text.strip.split(" ").first
         puts "\n"
         @i +=1
+        @more_count +=1
       end
       @page +=1
       if @home.css(".ds-paging").text.strip.include?("Next page")
