@@ -1,6 +1,6 @@
 class NewGem::CLI
 
-  #attr_accessor :i, :home, :page, :input_format
+  attr_accessor :i, :home, :page, :input_format
 
   def call
     puts "Hello! Would you like to check out today's shows or search by venue?"
@@ -19,28 +19,37 @@ class NewGem::CLI
     end
   end
 
-# def today_menu
-    #input = gets.strip
-      #input_int = input.to_i
-      #if input.downcase == "done"
-      #  puts "\n"
-      #  puts "Have a nice day - check back tomorrow!"
-      #  exit
-      #elsif input.downcase == "more"
-      #  @page +=1
-      #  puts "Here are some more listings..."
-      #  puts "\n"
-        # @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?@page=#{@page}")
-      #elsif (0 < input_int) && (input_int < num)
-      #  puts "I'll open that site for you...(and this would open choice ##{input_int})"
-      #  sleep (0.5)
-      #  Launchy.open("tinymixtapes.com")
+  def today_menu
+    input = gets.strip
+    input_int = input.to_i
+      if input.downcase == "done"
+        puts "\n"
+        puts "Have a nice day - check back tomorrow!"
+        exit
+      elsif input.downcase == "more"
+        @page +=1
+        puts "Here are some more listings..."
+        puts "\n"
+        @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?@page=#{@page}")
+        numbered_date_list
+      elsif (0 < input_int) && (input_int < num)
+        puts "I'll open that site for you...(and this would open choice ##{input_int})"
+        sleep (0.5)
+        Launchy.open("tinymixtapes.com")
         #Launchy.open(...)
-      #else
-      #  puts "I didn't understand your input. Please try again."
-      #      choose_by_num
-      #end      
+      else
+        return "I didn't understand your input. Please try again."
+      end
+    end
 
+  def numbered_date_list
+    @home.css(".ds-event-category-music").each_with_index do |x, index|
+      puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
+      puts x.css(".ds-listing-event-title-text").text
+      puts x.css(".dtstart").text.strip
+      puts "\n"
+    end
+  end
 
   def date_listings
     @page = 1
@@ -50,17 +59,11 @@ class NewGem::CLI
     puts "\n"
     puts "loading today's shows..."
     puts "\n"
-    
-    if @home.css(".ds-paging").text.strip.include?("Next page")
-      @home.css(".ds-event-category-music").each_with_index do |x, index|
-        puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
-        puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".dtstart").text.strip.split(" ").first
-        puts "\n"
-        num +=1
-      end
+  
+    if @home.css(".ds-paging").text.strip.include?("Next Page")
+      numbered_date_list
+      num +=1
       puts "If you'd like to find out more about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
-      # today_menu
       input = gets.strip
       input_int = input.to_i
       if input.downcase == "done"
@@ -71,7 +74,6 @@ class NewGem::CLI
         @page +=1
         puts "Here are some more listings..."
         puts "\n"
-        # @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?@page=#{@page}")
       elsif (0 < input_int) && (input_int < num)
         puts "I'll open that site for you...(and this would open choice ##{input_int})"
         sleep (0.5)
@@ -80,26 +82,17 @@ class NewGem::CLI
       else
         return "I didn't understand your input. Please try again."
       end
-      # <-- end today_menu
     else
-      @home.css(".ds-event-category-music").each_with_index do |x, index|
-        puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
-        puts x.css(".ds-listing-event-title-text").text
-        puts x.css(".dtstart").text.strip
-        puts "\n"
-        puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you'd like to exit, type done."
-        # today_menu
-        input_2 = gets.strip
-        return input_2
-      end
-    # <-- end today_menu
+      numbered_date_list
+      puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you'd like to exit, type done."
+      input_2 = gets.strip
+      return input_2
     end
   end
 
    def venue_menu
     input_2 = gets.chomp.downcase
     input_int = input_2.to_i
-    @more_count = 1
     while (!input_2.include?("done") && !input_2.include?("more") && (input_int == 0))
       puts "I didn't understand your input. Please enter the number of the show you're interested in, enter 'more' for another page of listings, or type 'done' to exit."
         venue_menu
@@ -122,8 +115,8 @@ class NewGem::CLI
         puts x.css(".ds-event-time").text.strip.split(" ").first
         puts "\n"
         @i +=1
-        @more_count +=1
       end
+      @more_count +=1
       @page +=1
       if @home.css(".ds-paging").text.strip.include?("Next page")
         puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
@@ -174,6 +167,7 @@ class NewGem::CLI
   def venue_listings
     @i = 1
     @page = 2
+    @more_count = 1
     puts "\n"
     puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
     input = gets.chomp
@@ -186,11 +180,11 @@ class NewGem::CLI
     else
       @home.css('.ds-event-category-music').each_with_index do |x, idx|
         puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
-          puts x.css(".ds-listing-event-title-text").text
-          puts x.css(".ds-event-time").text.strip.split(" ").first
-          puts "\n"
-          @i +=1
-          end
+        puts x.css(".ds-listing-event-title-text").text
+        puts x.css(".ds-event-time").text.strip.split(" ").first
+        puts "\n"
+        @i +=1
+      end
     end
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type 'more'. If you're done, type 'done'."
     venue_menu
