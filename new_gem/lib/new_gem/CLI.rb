@@ -1,6 +1,6 @@
 class NewGem::CLI
 
-  attr_accessor :i, :home, :page, :input_format
+  attr_accessor :i, :home, :page, :input_format, :last_page
 
   def call
     puts "Hello! Would you like to check out today's shows or search by venue?"
@@ -97,18 +97,21 @@ class NewGem::CLI
       puts "I didn't understand your input. Please enter the number of the show you're interested in, enter 'more' for another page of listings, or type 'done' to exit."
         venue_menu
     end
-    if input_2.downcase == "done"
+    if input_2.downcase.include?("done")
       puts "\n"
       puts "Have a nice day - check back tomorrow!"
       exit
-    elsif input_2.downcase == "more"
-      if @more_count < 2 
-        @i = 1
+    elsif input_2.downcase.include?("more")
+      if @last_page == true
+        puts "\n"
+        puts "You've reached the end of the listings for this venue. Please enter the number of the show you're interested in, or type 'done' to exit."
+        venue_menu
       end
       puts "\n"
       puts "Checking for more listings..."
       puts "\n"
       @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}?page=#{@page}"))
+      
       @home.css('.ds-event-category-music').each_with_index do |x, idx|
         puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
         puts x.css(".ds-listing-event-title-text").text.strip
@@ -116,13 +119,13 @@ class NewGem::CLI
         puts "\n"
         @i +=1
       end
-      @more_count +=1
       @page +=1
       if @home.css(".ds-paging").text.strip.include?("Next page")
         puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
         venue_menu
       else
         puts "You have reached the end of the listings for this venue. If you'd like to learn more about one of the shows, please enter its number. If you're done, type done."
+        @last_page = true
         venue_menu
       end
     elsif ((0 < input_int) && (input_int < @i))
@@ -167,7 +170,7 @@ class NewGem::CLI
   def venue_listings
     @i = 1
     @page = 2
-    @more_count = 1
+    @last_page = false
     puts "\n"
     puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
     input = gets.chomp
@@ -190,7 +193,7 @@ class NewGem::CLI
     venue_menu
   rescue OpenURI::HTTPError
     puts "\n"
-    puts "Sorry, I can't find that venue. Please try again."      
+    puts "Sorry, I couldn't find that venue. Please try again."      
     venue_listings
     end  
   end
