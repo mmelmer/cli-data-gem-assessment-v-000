@@ -28,6 +28,7 @@ class NewGem::CLI
         puts "Have a nice day - check back tomorrow!"
         exit
       elsif input.downcase == "more"
+        @num +=1
         @page +=1
         puts "\n"
         puts "Here are some more listings..."
@@ -37,22 +38,27 @@ class NewGem::CLI
       elsif input.downcase == "restart"
         @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
         date_listings
-      elsif (0 < input_int) && (input_int < num)
-        puts "I'll open that site for you...(and this would open choice ##{input_int})"
-        sleep (0.5)
-        Launchy.open("tinymixtapes.com")
+      elsif (0 < input_int) && (input_int < @num)
+        puts "I'll open that site for you..."
+        base = "http://nyc-shows.brooklynvegan.com/"
+        extension = @home.css(".ds-event-category-music")[input_int-1].css("a").first["href"]
+        url = base + extension.to_s
+        sleep(0.5)
+        Launchy.open(url)
         #Launchy.open(...)
       else
-        return "I didn't understand your input. Please try again."
+        puts "I didn't understand your input. Please try again."
+        today_menu
       end
     end
 
   def numbered_date_list
     @home.css(".ds-event-category-music").each_with_index do |x, index|
-      puts "#{index+1}. " + x.css(".ds-venue-name > a span").text + ":"
-      puts x.css(".ds-listing-event-title-text").text
+      puts "#{index+1}. " + x.css(".ds-venue-name > a span").text.strip + ":"
+      puts x.css(".ds-listing-event-title-text").text.strip
       puts x.css(".dtstart").text.strip
       puts "\n"
+      @num +=1
       end
     if @home.css(".ds-paging").text.strip.include?("Next Page")
       puts "If you'd like to learn about one of these shows, please enter its number. If you'd like to see more shows, type 'more'. If you're done, type 'done.'"
@@ -65,7 +71,7 @@ class NewGem::CLI
 
   def date_listings
     @page = 1
-    num = 1
+    @num = 1
 
     puts "\n"
     puts "loading today's shows..."
@@ -74,9 +80,9 @@ class NewGem::CLI
   
     if @home.css(".ds-paging").text.strip.include?("Next Page")
       numbered_date_list
-      num +=1
-      puts "If you'd like to find out more about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
-      today_menu
+      #num +=1
+      #puts "If you'd like to find out more about one of these shows, enter its number. If you'd like to hear about more shows, type more. If you're finished, type done."
+      #today_menu
       #input = gets.strip
       #input_int = input.to_i
       #if input.downcase == "done"
@@ -96,10 +102,10 @@ class NewGem::CLI
       #else
       #  return "I didn't understand your input. Please try again."
       #end
-    else
-      numbered_date_list
-      puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you'd like to exit, type done."
-      today_menu
+    #else
+     # numbered_date_list
+      #puts "This is the end of today's listings. If you'd like to find out about one of these shows, type its number. If you'd like to exit, type done."
+      #today_menu
       #input_2 = gets.strip
       #return input_2
     end
