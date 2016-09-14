@@ -1,1 +1,1 @@
-require_relative '..lib/show_listings'
+require_relative '../lib/show_listings'
