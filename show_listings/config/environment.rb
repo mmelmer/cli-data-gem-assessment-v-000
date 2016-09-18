@@ -1,0 +1,1 @@
+require_relative '../lib/show_listings.rb'
