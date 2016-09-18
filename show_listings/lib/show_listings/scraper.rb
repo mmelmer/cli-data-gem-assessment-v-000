@@ -31,11 +31,10 @@ class ShowListings::Scraper
     venue_menu
     rescue OpenURI::HTTPError
       puts "\n"
-      puts "Sorry, I couldn't find that venue. Please try again."      
+      puts "Sorry, I couldn't find that venue. Make sure you spelled the venue correctly, and please try again."      
       venue
     end
   end
-
 
   def date_choice
     if @home.css(".ds-paging").text.strip.include?("Next Page")
