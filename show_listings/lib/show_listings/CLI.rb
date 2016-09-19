@@ -1,5 +1,3 @@
-require 'pry'
-
 class ShowListings::CLI
   
   def call
@@ -21,7 +19,7 @@ class ShowListings::CLI
       puts "Which venue would you like to check out? (NOTE: please enter the FULL name of the venue without any punctuation!)"
       @venue_choice = gets.chomp.gsub(/\s/, '-')
       @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@venue_choice}"))
-      @choice = ShowListings::Scraper.new(@home)
+      @choice = ShowListings::Scraper.new(@home, @venue_choice)
       @choice.venue
     end
   end

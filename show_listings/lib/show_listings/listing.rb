@@ -1,7 +1,5 @@
 class ShowListings::Listing
 
-  #attr_accessor :buy_link, :info_link, :home
-
   def initialize(home, selection_number)
     @home = home
     @selection_number = selection_number
@@ -23,6 +21,7 @@ class ShowListings::Listing
   end
 
   def open_info
+    puts "\n"
     puts "Opening the page for that show..."
     sleep(0.5)
     Launchy.open(info_link)

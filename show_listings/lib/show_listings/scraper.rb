@@ -1,7 +1,8 @@
 class ShowListings::Scraper
 
-  def initialize(home)
+  def initialize(home, venue_choice=nil)
     @home = home
+    @venue_choice = venue_choice
   end
 
   def today
@@ -47,14 +48,14 @@ class ShowListings::Scraper
   end
 
   def numbered_list
-    @home.css('.ds-event-category-music').each_with_index do |x, idx|
+    @home.css('.ds-event-category-music').each_with_index do |event, idx|
       if @today == true
-        puts "#{idx+1}. " + x.css(".ds-venue-name").text.strip
+        puts "#{idx+1}. " + event.css(".ds-venue-name").text.strip
       elsif @today == false
-        puts "#{idx+1}. " + x.css(".ds-event-date").text.strip
+        puts "#{idx+1}. " + event.css(".ds-event-date").text.strip
       end
-      puts x.css(".ds-listing-event-title-text").text.strip
-      puts x.css(".ds-event-time").text.strip.split(" ").first
+      puts event.css(".ds-listing-event-title-text").text.strip
+      puts event.css(".ds-event-time").text.strip.split(" ").first
       puts "\n"
       @num +=1
     end
@@ -107,10 +108,10 @@ class ShowListings::Scraper
       puts "\n"
       puts "Checking for more listings..."
       puts "\n"
-      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@input_format}?page=#{@page}")) 
+      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@venue_choice}?page=#{@page}")) 
       numbered_list
       @page +=1
-      if @home.css(".ds-paging").text.strip.include?("Next page")
+      if @home.css(".ds-paging").text.strip.include?("Next Page")
         puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
         venue_menu
       else
@@ -145,4 +146,3 @@ class ShowListings::Scraper
       listing.open_info
     end
   end
-
