@@ -63,7 +63,7 @@ class ShowListings::Scraper
 
   def today_menu
     today_entry = gets.strip
-    @input_int = today_entry.to_i
+    @entry_int = today_entry.to_i
     if today_entry.downcase == "done"
       puts "\n"
       puts "Have a nice day - check back tomorrow!"
@@ -80,7 +80,7 @@ class ShowListings::Scraper
     elsif today_entry.downcase == "restart"
       @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
       today
-    elsif (0 < @input_int) && (@input_int < @num)
+    elsif (0 < @entry_int) && (@entry_int < @num)
       buy_info_choice
     else
       puts "I didn't understand your input. Please try again."
@@ -90,8 +90,8 @@ class ShowListings::Scraper
 
   def venue_menu
     venue_entry = gets.chomp.downcase
-    @input_int = venue_entry.to_i
-    while (!venue_entry.include?("done") && !venue_entry.include?("more") && (@input_int == 0))
+    @entry_int = venue_entry.to_i
+    while (!venue_entry.include?("done") && !venue_entry.include?("more") && (@entry_int == 0))
       puts "I didn't understand your input. Please enter the number of the show you're interested in, enter 'more' for another page of listings, or type 'done' to exit."
         venue_menu
     end
@@ -119,17 +119,17 @@ class ShowListings::Scraper
         @last_page = true
         venue_menu
       end
-    elsif ((0 < @input_int) && (@input_int < @num))
+    elsif ((0 < @entry_int) && (@entry_int < @num))
       buy_info_choice
-    elsif @input_int > 0
+    elsif @entry_int > 0
       puts "Please enter a number between 1 and #{@num-1}"
       venue_menu
     end
   end
 
   def buy_info_choice
-    listing = ShowListings::Listing.new(@home, @input_int)
-    if @home.css(".ds-event-category-music")[@input_int-1].to_s.include?("ds-buy-tix")
+    listing = ShowListings::Listing.new(@home, @entry_int)
+    if @home.css(".ds-event-category-music")[@entry_int-1].to_s.include?("ds-buy-tix")
       puts "\n"
       puts "Would you like to buy tickets for that show or just get more info?"
       buy_or_info = gets.chomp
