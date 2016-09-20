@@ -1,10 +1,7 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
-require "../config/environment"
-
-require "pry"
-Pry.start
+require "../config/show_listings.rb"
 
 require "irb"
 IRB.start

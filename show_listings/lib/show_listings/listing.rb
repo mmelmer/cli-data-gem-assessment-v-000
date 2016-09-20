@@ -14,17 +14,17 @@ class ShowListings::Listing
   end
 
   def open_buy
-    puts "\n"
-    puts "You can buy tickets here..."
+    puts "\nYou can buy tickets here..."
     sleep(0.5)
     Launchy.open(buy_link)
+    exit
   end
 
   def open_info
-    puts "\n"
-    puts "Opening the page for that show..."
+    puts "\nOpening the page for that show..."
     sleep(0.5)
     Launchy.open(info_link)
+    exit
   end
 
 end
