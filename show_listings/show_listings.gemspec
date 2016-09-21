@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["mikemelmer@gmail.com"]
 
   spec.summary       = "This gem allows you to quickly search NYC concert listings; it allows you to view the day's listings or search by venue; it also links you to info and/or ticket pages for any show."
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/mmelmer/cli-data-gem-assessment-v-000"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
