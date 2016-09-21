@@ -19,7 +19,7 @@ class ShowListings::CLI
       begin 
         home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{venue_choice}"))
         while !home.to_s.include?("ds-event-category-music")
-          puts "\nThere aren't any shows scheduled at #{venue_choice.split.each {|w| w.capitalize!}.join(" ")}."
+          puts "\nThere aren't any shows scheduled at #{venue_choice.split("-").each {|w| w.capitalize!}.join(" ")}."
           puts
           sleep(0.5)
           call
@@ -33,5 +33,4 @@ class ShowListings::CLI
       choice.venue
     end
   end
-
 end
