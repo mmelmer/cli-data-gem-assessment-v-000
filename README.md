@@ -3,7 +3,7 @@ Add the following to your Gemfile:
   gem 'show_listings'  
 
 And then execute:
-  $ gem install museum_shows
+  $ gem install show_listings
 
 # Overview
 This gem allows the user to seach through NYC concert listings found on brooklynvegan.com To start program, simply run the bin/show_listings.rb file. 
