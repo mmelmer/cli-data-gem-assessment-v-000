@@ -3,12 +3,12 @@ class ShowListings::Scraper
   def initialize(home, venue_choice=nil)
     @home = home
     @venue_choice = venue_choice
+    @num = 1
+    @page = 1
   end
 
   def today
     @today = true
-    @page = 1
-    @num = 1
     puts "\nloading today's shows..."
     puts
     sleep(0.5)
@@ -18,8 +18,6 @@ class ShowListings::Scraper
  
   def venue
     @today = false
-    @num = 1
-    @page = 2
     @last_page = false
     numbered_list
     puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type 'more'. If you're done, type 'done'."
@@ -58,10 +56,10 @@ class ShowListings::Scraper
       puts "\nHave a nice day - check back tomorrow!"
       exit
     elsif today_entry.downcase == "more"
-      @num +=1
       @page +=1
       puts "\nHere are some more listings..."
       @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?page=#{@page}")
+      @num = 1
       numbered_list
       date_choice
     elsif today_entry.downcase == "restart"
@@ -69,6 +67,9 @@ class ShowListings::Scraper
       today
     elsif (0 < @input_int) && (@input_int < @num)
       buy_info_choice
+    elsif @input_int > @num-1
+      puts "Please enter a number between 1 and #{@num-1}"
+      today_menu
     else
       puts "I didn't understand your input. Please try again."
       today_menu
@@ -93,9 +94,10 @@ class ShowListings::Scraper
       end
       puts "\nChecking for more listings..."
       puts
-      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@venue_choice}?page=#{@page}")) 
-      numbered_list
       @page +=1
+      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/venues/#{@venue_choice}?page=#{@page}")) 
+      @num = 1
+      numbered_list
       if @home.css(".ds-paging").text.strip.include?("Next Page")
         puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type more. If you're done, type done."
         venue_menu
