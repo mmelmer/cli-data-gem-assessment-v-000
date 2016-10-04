@@ -1,79 +1,40 @@
 class ShowListings::Scraper
 
-  def initialize(home, venue_choice=nil)
-    @home = home
-    @venue_choice = venue_choice
-    @num = 1
-    @page = 1
-  end
-
-  def today
-    @today = true
-    puts "\nloading today's shows..."
-    puts
-    sleep(0.5)
-    numbered_list
-    date_choice
-  end
- 
-  def venue
-    @today = false
-    @last_page = false
-    numbered_list
-    puts "Would you like to find out more about any of these shows? If so, enter the show's number. If you want to see more shows, type 'more'. If you're done, type 'done'."
-    venue_menu
-  end
-
-  def numbered_list
-    puts
-    @home.css('.ds-event-category-music').each_with_index do |event, idx|
-      if @today == true
-        puts "#{idx+1}. " + event.css(".ds-venue-name").text.strip
-      elsif @today == false
-        puts "#{idx+1}. " + event.css(".ds-event-date").text.strip
+  def self.scrape_events_today(url)
+    url.css('.ds-event-category-music').each do |event|
+      if event.css(".ds-listing-actions").to_s.include?("buy-tix")
+        tix_url = event.css(".ds-buy-tix").css("a").first["href"]
+      else
+        tix_url = nil
       end
-      puts event.css(".ds-listing-event-title-text").text.strip
-      puts event.css(".ds-event-time").text.strip.split(" ").first
-      puts "\n"
-      @num +=1
+      ShowListings::Event.new({
+        venue: event.css(".ds-venue-name").text.strip,
+        artist: event.css(".ds-listing-event-title-text").text.strip,
+        time: event.css(".ds-event-time").text.strip.split(" ").first,
+        info_link: "http://nyc-shows.brooklynvegan.com/" + event.css("a").first["href"],
+        buy_link: tix_url,
+        date: url.css(".ds-list-break-date").text.strip
+      })
     end
   end
 
-  def date_choice
-    if @home.css(".ds-paging").text.strip.include?("Next Page")
-      puts "If you'd like to learn about one of these shows, please enter its number. If you'd like to see more shows, type 'more'. If you're done, type 'done.'"
-      today_menu
-    else
-      puts "You've reached the end of today's listings. Choose the number of the show you're interested in, type 'done' if you're done, or type 'restart' to go back to the beginning of today's listings."
-      today_menu
+  def self.scrape_events_venue(url)
+    url.css('.ds-event-category-music').each do |event|
+      if event.to_s.include?("buy-tix")
+        buy = event.css(".ds-btn-container-buy-tix").css("a").first["href"]
+      else
+        buy = nil  
+      end
+      ShowListings::Event.new({
+        venue: event.css(".ds-venue-name").text.strip,
+        artist: event.css(".ds-listing-event-title-text").text.strip,
+        time: event.css(".ds-event-time").text.strip.split(" ").first,
+        info_link: "http://nyc-shows.brooklynvegan.com/" + event.css("a").first["href"],
+        buy_link: buy,
+        date: url.css(".ds-break-left").first.text.strip.split("\n")[1].strip,
+      })
     end
-  end
 
-  def today_menu
-    today_entry = gets.strip.downcase
-    @input_int = today_entry.to_i
-    if today_entry.downcase == "done"
-      puts "\nHave a nice day - check back tomorrow!"
-      exit
-    elsif today_entry.downcase == "more"
-      @page +=1
-      puts "\nHere are some more listings..."
-      @home = Nokogiri::HTML(open"http://nyc-shows.brooklynvegan.com/events/today?page=#{@page}")
-      @num = 1
-      numbered_list
-      date_choice
-    elsif today_entry.downcase == "restart"
-      @home = Nokogiri::HTML(open("http://nyc-shows.brooklynvegan.com/events/today"))
-      today
-    elsif (0 < @input_int) && (@input_int < @num)
-      buy_info_choice
-    elsif @input_int > @num-1
-      puts "Please enter a number between 1 and #{@num-1}"
-      today_menu
-    else
-      puts "I didn't understand your input. Please try again."
-      today_menu
-    end
   end
 
   def venue_menu
@@ -106,30 +67,12 @@ class ShowListings::Scraper
         @last_page = true
         venue_menu
       end
-    elsif ((0 < @input_int) && (@input_int < @num))
+    elsif ((0 < @input_int) && (@input_int < @last))
       buy_info_choice
     elsif @input_int > 0
-      puts "Please enter a number between 1 and #{@num-1}"
+      puts "Please enter a number between 1 and #{@last}"
       venue_menu
     end
   end
-
-  def buy_info_choice
-    listing = ShowListings::Listing.new(@home, @input_int)
-    if @home.css(".ds-event-category-music")[@input_int-1].to_s.include?("ds-buy-tix")
-      puts "\nWould you like to buy tickets for that show or just get more info?"
-      buy_or_info = gets.chomp.downcase
-      while (!buy_or_info.include?("tix") && !buy_or_info.include?("tick") && !buy_or_info.include?("info") && !buy_or_info.include?("buy"))
-        puts "\nI didn't understand your input. Would you like to buy tickets for that show, or simply learn more information?"
-        buy_or_info = gets.chomp.downcase
-      end 
-      if (buy_or_info.include?("tix") || buy_or_info.include?("tick") || buy_or_info.include?("buy")) 
-        listing.open_buy
-      elsif buy_or_info.include?("info")
-        listing.open_info
-      end
-    else
-      listing.open_info
-    end
-  end
+  
 end
